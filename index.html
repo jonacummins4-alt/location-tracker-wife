@@ -111,11 +111,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
   .entry-card { padding: 14px; }
   .entry-card h2 { margin-bottom: 10px; }
   .entry-row { flex-direction: column; gap: 8px; }
-  .entry-row-top { display: flex; gap: 8px; }
-  .entry-row-top .entry-group { flex: 1; min-width: 0; }
-  .entry-row-top .entry-group:first-child { flex: 1.2; }
-  .entry-row-top .date-input { width: 100% !important; min-width: 0; box-sizing: border-box; }
-  .entry-row-top .type-select { width: 100% !important; min-width: 0; box-sizing: border-box; }
+  .entry-row-top { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .entry-row-top .entry-group { min-width: 0; }
+  .entry-row-top .date-input { width: 100% !important; box-sizing: border-box; }
+  .entry-row-top .type-select { width: 100% !important; box-sizing: border-box; }
   .entry-group input, .entry-group select { width: 100% !important; padding: 7px 10px; }
   .btn-primary { width: 100%; margin-top: 4px; }
   .summary-strip { gap: 6px; margin-bottom: 14px; }
@@ -471,8 +470,10 @@ function render() {
   const yearEnd = state.selectedYear === today.getFullYear() ? today : new Date(state.selectedYear, 11, 31);
   const loggedSet = new Set(allYearEntries.map(e => e.date));
   const missingDates = [];
-  for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate()+1)) {
+  const todayStr = today.toISOString().slice(0,10);
+  for (let d = new Date(yearStart); d < today; d.setDate(d.getDate()+1)) {
     const ds = d.toISOString().slice(0,10);
+    if (ds >= todayStr) break;
     if (!loggedSet.has(ds)) missingDates.push(ds);
   }
   const missingPill = div({class: 'summary-pill missing-pill' + (missingDates.length > 0 ? ' has-missing' : '')});
