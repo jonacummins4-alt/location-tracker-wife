@@ -565,6 +565,7 @@ function render() {
   const importToggle = btn('btn-sm', state.showImport ? '▲ Hide Import' : '⬆ Import Historical Data', () => {
     state.showImport = !state.showImport; render();
   });
+  importToggle.style.marginBottom = "16px";
   app.appendChild(importToggle);
 
   if(state.showImport) {
