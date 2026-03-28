@@ -97,6 +97,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .import-area textarea { width: 100%; resize: vertical; min-height: 80px; font-size: 12px; font-family: monospace; }
 .import-hint { font-size: 11px; color: #475569; margin-top: 6px; }
 
+.missing-pill { position: relative; cursor: pointer; user-select: none; }
+.missing-pill.has-missing { border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.08); }
+.missing-pill.has-missing strong { color: #f87171; }
+.missing-dropdown { display: none; position: absolute; top: calc(100% + 6px); left: 0; min-width: 220px; max-width: 300px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 10px; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+.missing-pill.open .missing-dropdown { display: block; }
+.missing-dropdown-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px; }
+.missing-dates-list { display: flex; flex-wrap: wrap; gap: 5px; max-height: 160px; overflow-y: auto; }
+.missing-date-btn { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.3); color: #f87171; cursor: pointer; font-family: inherit; }
+.missing-date-btn:hover { background: rgba(239,68,68,0.25); }
 @media (max-width: 600px) {
   .stats-grid { grid-template-columns: 1fr; }
   .entry-card { padding: 14px; }
@@ -455,6 +464,44 @@ function render() {
     pill.innerHTML = `${p.label}: <strong>${p.val}</strong>`;
     strip.appendChild(pill);
   });
+  // Missing days pill
+  const allYearEntries = getEntriesForPeriod(state.selectedYear);
+  const today = new Date();
+  const yearStart = new Date(state.selectedYear, 0, 1);
+  const yearEnd = state.selectedYear === today.getFullYear() ? today : new Date(state.selectedYear, 11, 31);
+  const loggedSet = new Set(allYearEntries.map(e => e.date));
+  const missingDates = [];
+  for (let d = new Date(yearStart); d <= yearEnd; d.setDate(d.getDate()+1)) {
+    const ds = d.toISOString().slice(0,10);
+    if (!loggedSet.has(ds)) missingDates.push(ds);
+  }
+  const missingPill = div({class: 'summary-pill missing-pill' + (missingDates.length > 0 ? ' has-missing' : '')});
+  missingPill.innerHTML = missingDates.length > 0
+    ? `⚠️ <strong>${missingDates.length} missing</strong> ▼`
+    : `✅ <strong>No missing days</strong>`;
+  if (missingDates.length > 0) {
+    const dropdown = div({class: 'missing-dropdown'});
+    dropdown.appendChild(div({class: 'missing-dropdown-title'}, `Missing days in ${state.selectedYear} — click to fill`));
+    const list = div({class: 'missing-dates-list'});
+    missingDates.forEach(dt => {
+      const b = el('button', {class: 'missing-date-btn'}, dt);
+      b.onclick = (ev) => {
+        ev.stopPropagation();
+        const di = document.querySelector('input[type=date]');
+        if (di) { di.value = dt; di.dispatchEvent(new Event('input',{bubbles:true})); di.closest('.entry-card')?.scrollIntoView({behavior:'smooth',block:'center'}); }
+        missingPill.classList.remove('open');
+      };
+      list.appendChild(b);
+    });
+    dropdown.appendChild(list);
+    missingPill.appendChild(dropdown);
+    missingPill.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      missingPill.classList.toggle('open');
+    });
+    document.addEventListener('click', () => missingPill.classList.remove('open'), {once: false});
+  }
+  strip.appendChild(missingPill);
   app.appendChild(strip);
 
   // Stats grid
