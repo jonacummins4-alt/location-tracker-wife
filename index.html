@@ -27,10 +27,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
 .entry-group input, .entry-group select { font-family: inherit; font-size: 13px; color: #e2e8f0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; outline: none; }
 .entry-group input:focus, .entry-group select:focus { border-color: #6366f1; }
 .entry-group select option { background: #1e293b; }
-.entry-row-top { display: flex; flex-direction: column; gap: 8px; }
-.entry-row-top .entry-group { width: 100%; }
-.entry-row-top .date-input { width: 100%; box-sizing: border-box; }
-.entry-row-top .type-select { width: 100%; box-sizing: border-box; }
+.entry-row-top { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+.entry-row-top .entry-group { min-width: 0; overflow: hidden; }
+.entry-row-top .date-input { width: 100% !important; max-width: 100%; box-sizing: border-box; font-size: 12px; padding: 6px 6px; }
+.entry-row-top .type-select { width: 100% !important; max-width: 100%; box-sizing: border-box; font-size: 12px; padding: 6px 4px; }
 .location-input { width: 220px; }
 .type-select { }
 
@@ -116,7 +116,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
   .stats-grid { grid-template-columns: 1fr; }
   .entry-card { padding: 14px; }
   .entry-card h2 { margin-bottom: 10px; }
-  .entry-row { flex-direction: column; gap: 8px; }
+  .entry-row { flex-direction: column; gap: 8px; align-items: stretch; }
   .entry-group input, .entry-group select { width: 100% !important; padding: 7px 10px; }
   .btn-primary { width: 100%; margin-top: 4px; }
   .summary-strip { gap: 6px; margin-bottom: 14px; }
