@@ -103,9 +103,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; b
   .entry-card h2 { margin-bottom: 10px; }
   .entry-row { flex-direction: column; gap: 8px; }
   .entry-row-top { display: flex; gap: 8px; }
-  .entry-row-top .entry-group { flex: 1; min-width: 0; overflow: hidden; }
-  .entry-row-top .date-input { width: 100% !important; min-width: 0; }
-  .entry-row-top .type-select { width: 100% !important; min-width: 0; }
+  .entry-row-top .entry-group { flex: 1; min-width: 0; }
+  .entry-row-top .entry-group:first-child { flex: 1.2; }
+  .entry-row-top .date-input { width: 100% !important; min-width: 0; box-sizing: border-box; }
+  .entry-row-top .type-select { width: 100% !important; min-width: 0; box-sizing: border-box; }
   .entry-group input, .entry-group select { width: 100% !important; padding: 7px 10px; }
   .btn-primary { width: 100%; margin-top: 4px; }
   .summary-strip { gap: 6px; margin-bottom: 14px; }
