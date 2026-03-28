@@ -245,10 +245,7 @@ function btn(cls, label, onclick) {
 // ── Gap Checker ──────────────────────────────────────────────────────────
 function checkAndShowGaps(lastLoggedDate) {
   const yr = new Date(lastLoggedDate + 'T12:00:00').getFullYear();
-  const today2 = new Date(lastLoggedDate + 'T12:00:00');
-  const fourteenDaysAgo = new Date(today2);
-  fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
-  const start = fourteenDaysAgo < new Date(yr, 0, 1) ? new Date(yr, 0, 1) : fourteenDaysAgo;
+  const start = new Date(yr, 0, 1);
   const end = new Date(lastLoggedDate + 'T12:00:00');
   const loggedDates = new Set(state.entries.filter(e => {
     const d = new Date(e.date + 'T12:00:00');
@@ -297,18 +294,23 @@ function render() {
   if(state._showGapWarning && state._missingDays?.length > 0) {
     const banner = div({class:'gap-banner'});
     const missing = state._missingDays;
-    banner.innerHTML = `⚠️ <strong>${missing.length} day${missing.length>1?'s':''} missing</strong> before your last entry: ${missing.slice(0,3).join(', ')}${missing.length>3?' …':''}`;
-    const fillDiv = div({style:'margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;'});
-    missing.slice(0,5).forEach(dt => {
+    const bannerHeader = div({style:'display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;'});
+    const bannerTitle = div({});
+    bannerTitle.innerHTML = `⚠️ <strong>${missing.length} day${missing.length>1?'s':''} missing</strong> since Jan 1 — click any date to fill it in`;
+    const dismissBtn = btn('btn-sm', '✕', () => { state._showGapWarning=false; state._missingDays=[]; render(); });
+    dismissBtn.title = 'Dismiss';
+    bannerHeader.appendChild(bannerTitle);
+    bannerHeader.appendChild(dismissBtn);
+    banner.appendChild(bannerHeader);
+    const fillDiv = div({style:'display:flex;gap:5px;flex-wrap:wrap;max-height:120px;overflow-y:auto;padding:2px 0;'});
+    missing.forEach(dt => {
       const b = btn('btn-sm', dt, () => {
         const di = document.querySelector('input[type=date]');
-        if(di) { di.value = dt; di.scrollIntoView({behavior:'smooth'}); }
+        if(di) { di.value = dt; di.dispatchEvent(new Event('input',{bubbles:true})); di.scrollIntoView({behavior:'smooth',block:'center'}); }
       });
+      b.style.cssText='font-size:11px;padding:3px 7px;background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.4);color:#fbbf24;';
       fillDiv.appendChild(b);
     });
-    const dismissBtn = btn('btn-sm', '✕ Dismiss', () => { state._showGapWarning=false; state._missingDays=[]; render(); });
-    dismissBtn.style.marginLeft='auto';
-    fillDiv.appendChild(dismissBtn);
     banner.appendChild(fillDiv);
     app.appendChild(banner);
   }
