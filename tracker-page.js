@@ -33,7 +33,15 @@
     if (token) localStorage.setItem(TOKEN_KEY, token);
   }
 
-  window.trackerSignOut = function () {
+  window.trackerSignOut = async function () {
+    try {
+      await window.api("sign-out");
+    } catch (e) {
+      if (e.status !== 401) {
+        if (typeof showToast === "function") showToast(friendly(e) || "Could not sign out.");
+        return;
+      }
+    }
     localStorage.removeItem(TOKEN_KEY);
     window.showTrackerGate("");
   };
